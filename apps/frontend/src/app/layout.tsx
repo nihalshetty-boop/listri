@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
 import { Inter } from "next/font/google";
+import { ReduxProvider } from "@/components/ReduxProvider";
+import Header from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,19 +18,19 @@ const geistMono = Geist_Mono({
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Listri",
   description: "Buy & Sell Anything, Easily.",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <header className="p-4 border-b bg-white shadow-sm">
-          <div className="container mx-auto font-bold text-xl">Listri</div>
-        </header>
-        <main className="container mx-auto p-4">{children}</main>
+      <body>
+        <ReduxProvider>
+          <Header /> {}
+          <main className="container mx-auto p-4">{children}</main>
+        </ReduxProvider>
       </body>
     </html>
   );

@@ -5,11 +5,16 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { loginUser } from "@/lib/api"; 
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "@/store/slices/authSlice";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Enter a valid email" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  email: z.string().email(),
+  password: z.string().min(6),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -23,8 +28,20 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginForm) => {
-    console.log("Login data:", data);
+  const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
+  const auth = useSelector((state: RootState) => state.auth);
+  console.log("Auth state:", auth);
+
+
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      const res = await loginUser(data);
+      dispatch(loginSuccess({ user: res.user, token: res.token }));
+      setMessage("Logged in successfully");
+    } catch (err: any) {
+      setMessage(`${err.message}`);
+    }
   };
 
   return (
@@ -40,6 +57,7 @@ export default function LoginPage() {
           {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
         </div>
         <Button type="submit" className="w-full">Login</Button>
+        {message && <p className="text-center mt-4 text-sm">{message}</p>}
       </form>
     </div>
   );

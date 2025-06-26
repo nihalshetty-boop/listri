@@ -345,6 +345,9 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .mt-4 {
+    margin-top: calc(var(--spacing) * 4);
+  }
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
   }
@@ -356,6 +359,9 @@
   }
   .grid {
     display: grid;
+  }
+  .hidden {
+    display: none;
   }
   .inline-flex {
     display: inline-flex;
@@ -400,6 +406,9 @@
   .items-start {
     align-items: flex-start;
   }
+  .justify-between {
+    justify-content: space-between;
+  }
   .justify-center {
     justify-content: center;
   }
@@ -408,6 +417,9 @@
   }
   .gap-2 {
     gap: calc(var(--spacing) * 2);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
   }
   .gap-6 {
     gap: calc(var(--spacing) * 6);
@@ -772,6 +784,11 @@
       @supports (color: color-mix(in lab, red, red)) {
         --tw-ring-color: color-mix(in oklab, var(--destructive) 20%, transparent);
       }
+    }
+  }
+  .sm\:block {
+    @media (width >= 40rem) {
+      display: block;
     }
   }
   .md\:text-sm {
