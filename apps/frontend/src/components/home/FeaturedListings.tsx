@@ -3,18 +3,19 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { userListings } from "@/lib/userListings";
 
 export type Listing = {
-  id: number;
+  id: number | string;
   title: string;
   price: number;
   imageUrl: string;
   category: string;
-  source?: "user" | "api"; 
+  source?: "user" | "api";
 };
 
 export function FeaturedListings() {
@@ -88,21 +89,27 @@ export function FeaturedListings() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredListings.map((item) => (
-            <Card key={`${item.source}-${item.id}`}>
-              <CardContent className="p-4">
-                <div className="relative w-full h-40 mb-4">
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.title}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded"
-                  />
-                </div>
-                <h3 className="text-lg font-medium">{item.title}</h3>
-                <p className="text-gray-600">${item.price.toFixed(2)}</p>
-              </CardContent>
-            </Card>
+            <Link
+              key={`${item.source}-${item.id}`}
+              href={`/listing/${item.id}`}
+              className="block hover:shadow-md transition"
+            >
+              <Card>
+                <CardContent className="p-4">
+                  <div className="relative w-full h-40 mb-4">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded"
+                    />
+                  </div>
+                  <h3 className="text-lg font-medium">{item.title}</h3>
+                  <p className="text-gray-600">${item.price.toFixed(2)}</p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

@@ -3,10 +3,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type Listing = {
   id: string;
   title: string;
+  description: string;
   price: number;
   imageUrl: string;
   category: string;
   userId: string;
+  createdAt: string;
 };
 
 type ListingsState = {
@@ -18,18 +20,22 @@ const initialState: ListingsState = {
     {
       id: "l1",
       title: "Bluetooth Speaker",
+      description: "Portable wireless speaker with deep bass.",
       price: 45.0,
-      imageUrl: "/images/mock/bluetooth.jpg",
+      imageUrl: "/images/mock/bluetooth.png",
       category: "electronics",
       userId: "u1",
+      createdAt: "2024-05-01T12:00:00Z",
     },
     {
       id: "l2",
       title: "Handmade Bracelet",
+      description: "Elegant and minimal handcrafted bracelet.",
       price: 20.0,
-      imageUrl: "/images/mock/bracelet.jpg",
+      imageUrl: "/images/mock/bracelet.png",
       category: "jewelery",
       userId: "u2",
+      createdAt: "2024-05-03T14:30:00Z",
     },
   ],
 };

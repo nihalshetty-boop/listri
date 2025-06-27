@@ -3,6 +3,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { RootState } from "@/store";
 import {
   deleteListing,
@@ -48,36 +49,38 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {listings.map((item) => (
               <Card key={item.id}>
-                <CardContent className="p-4">
-                  <div className="relative w-full h-40 mb-4">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded"
-                    />
-                  </div>
-                  <h3 className="text-lg font-medium">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    ${item.price.toFixed(2)}
-                  </p>
-                  <div className="flex justify-between">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => router.push(`/edit-item/${item.id}`)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
+                <Link href={`/listing/${item.id}`} className="block">
+                  <CardContent className="p-4 pb-2">
+                    <div className="relative w-full h-40 mb-4">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded"
+                      />
+                    </div>
+                    <h3 className="text-lg font-medium">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      ${item.price.toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Link>
+                <CardContent className="flex justify-between pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/edit-item/${item.id}`)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    Delete
+                  </Button>
                 </CardContent>
               </Card>
             ))}

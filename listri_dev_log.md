@@ -130,4 +130,40 @@ A structured record of all development phases and progress for the **Listri** fu
   - Listing display, management, and ownership filtering.
 - All functionality built using frontend state (Redux) as a stand-in for future backend logic.
 
+---
+
+## ✅ Phase 4: Listing Creation, Detail View & Routing
+
+### ➕ Post Item Form (`/post-item`)
+- Created full listing form with React Hook Form + Zod validation.
+- Fields: `title`, `description`, `price`, `imageUrl`, `category`.
+- On submit:
+  - Generates `id`, `createdAt`, `userId`.
+  - Dispatches to Redux `listingsSlice`.
+  - Redirects to `/dashboard`.
+
+### 🔍 Listing Detail Page (`/listing/:id`)
+- Created dynamic route with fallback logic:
+  - First checks Redux state
+  - Then checks `userListings.ts`
+  - Finally fetches from [Fake Store API](https://fakestoreapi.com/products/:id)
+- Normalized results using a shared `UnifiedListing` type.
+- Displays image, title, price, description, category, and seller ID.
+- Added "Contact Seller" (stub) and "Back to Home" navigation.
+
+### 🔗 Internal Routing Enhancements
+- Wrapped homepage and dashboard cards in `<Link href="/listing/:id">` for navigation.
+- Supported ID normalization (number or string).
+- Resolved 404 issue by supporting multi-source ID lookups.
+
+### 🛠️ Technical Improvements
+- Used `useParams()` for dynamic routing.
+- Applied `"use client"` to all affected components.
+- Improved error resilience with `loading` and `notFound()` logic.
+
+### ✅ Phase Closure
+- Phase 4 completed with full listing creation, viewing, and routing.
+- Fully supports merged data sources: Redux, local mock, and external API.
+- Ready for backend/database integration in Phase 5.
+
 
