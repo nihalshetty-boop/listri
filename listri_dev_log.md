@@ -65,3 +65,38 @@ A structured record of all development phases and progress for the **Listri** fu
 - Phase 2 will begin with the **Homepage Layout**.
 - Future development will be appended here by phase.
 
+---
+
+## ✅ Phase 2: Homepage Build & Integration
+
+### 🏠 Homepage Sections
+- Built the main homepage layout using modular components.
+- Created:
+  - `HeroSection`: Headline, subheading, CTA button.
+  - `FeaturedListings`: Fetched live data from [Fake Store API](https://fakestoreapi.com).
+  - `CategoryHighlights`: Interactive, icon-based category grid with links to filters.
+  - `HowItWorks`: 4-step guide with icons (Lucide).
+  - `Footer`: Links to static `/about`, `/contact`, `/terms` pages.
+
+### 📦 Listings Integration
+- Combined mock `userListings` with external API results.
+- Created reusable `Listing` type and shared across modules.
+- Stored mock images in `public/images/mock/`.
+- Implemented category-based filtering via `?category=...`.
+
+### 🔧 UI Behavior & Routing
+- Fixed hydration errors in `Header` by deferring client-side state rendering with `useEffect`.
+- Added "Clear Filters" button using `router.push("/")`.
+- Footer links route to real static pages with placeholder content.
+
+### 🛠 Folder Structure & Best Practices
+- Kept all homepage components modular in `components/home/`.
+- API listings fetched on client; real listings stubbed in from mock data for now.
+- Updated `next.config.js` to allow external image domains.
+
+### ✅ Phase Closure
+- Phase 2 complete with homepage MVP + live data integration.
+- UI polish and design enhancements deferred to after Phase 4 or 5.
+- Next phase: **User Dashboard & Profile (`/dashboard`)**
+
+

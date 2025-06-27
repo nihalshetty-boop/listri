@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,11 @@ import { Button } from "@/components/ui/button";
 export default function Header() {
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -22,7 +28,7 @@ export default function Header() {
         </Link>
 
         <nav className="flex gap-4">
-          {!isLoggedIn ? (
+          {!mounted ? null : !isLoggedIn ? (
             <>
               <Link href="/login">
                 <Button variant="ghost">Login</Button>
@@ -33,9 +39,11 @@ export default function Header() {
             </>
           ) : (
             <>
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                Hello, {user?.email}
-              </span>
+              {user?.email && (
+                <span className="text-sm text-muted-foreground hidden sm:block">
+                  Hello, {user.email}
+                </span>
+              )}
               <Link href="/dashboard">
                 <Button variant="ghost">Dashboard</Button>
               </Link>
