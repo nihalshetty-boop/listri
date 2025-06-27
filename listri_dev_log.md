@@ -99,4 +99,35 @@ A structured record of all development phases and progress for the **Listri** fu
 - UI polish and design enhancements deferred to after Phase 4 or 5.
 - Next phase: **User Dashboard & Profile (`/dashboard`)**
 
+---
+
+## ✅ Phase 3: User Listing System (Dashboard → Posting → Editing)
+
+### 🧾 Dashboard & User Listings
+- Created `/dashboard` route with protected access.
+- Displays logged-in user info and their posted listings.
+- Listings pulled dynamically from `listingsSlice` in Redux.
+- Filtered using `userId` to show only relevant data.
+
+### 🗃️ Listings Redux Slice
+- Added `listingsSlice.ts` with full CRUD actions:
+  - `addListing`, `editListing`, `deleteListing`
+- Created `selectUserListings(userId)` selector.
+- Mock listings seeded with sample users and categories.
+
+### 🧑‍💻 Listing Card Actions
+- Each listing includes:
+  - **Edit** button → links to `/edit-item/:id`
+  - **Delete** button → removes from Redux
+- Cards show title, price, and image using `next/image`.
+
+### ➕ Post New Item Entry Point
+- Added “Post New Item” button linking to `/post-item`.
+- Prepares for Phase 4 (listing creation form and detail view).
+
+### ✅ Phase Closure
+- Phase 3 delivers a complete internal user listing system:
+  - Listing display, management, and ownership filtering.
+- All functionality built using frontend state (Redux) as a stand-in for future backend logic.
+
 
