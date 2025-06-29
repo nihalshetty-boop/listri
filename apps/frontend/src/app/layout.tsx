@@ -16,20 +16,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
-  title: "Listri",
-  description: "Buy & Sell Anything, Easily.",
+  title: "Listri - Buy & Sell Anything, Easily",
+  description: "A modern marketplace for everyone. Buy, sell, and discover great deals on Listri.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <body className="min-h-screen bg-gray-50">
         <ReduxProvider>
-          <Header /> {}
-          <main className="container mx-auto p-4">{children}</main>
+          <Header />
+          <main className="min-h-screen">{children}</main>
         </ReduxProvider>
       </body>
     </html>
