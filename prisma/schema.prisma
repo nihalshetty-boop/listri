@@ -14,9 +14,23 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  email    String  @unique
-  name     String
-  password String
-  createdAt DateTime @default(now())
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String
+  password  String
+  createdAt DateTime   @default(now())
+  listings  Listing[]  @relation("UserListings") 
 }
+
+model Listing {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  imageUrl    String
+  category    String
+  createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation("UserListings", fields: [userId], references: [id]) 
+}
+

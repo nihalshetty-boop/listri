@@ -166,4 +166,48 @@ A structured record of all development phases and progress for the **Listri** fu
 - Fully supports merged data sources: Redux, local mock, and external API.
 - Ready for backend/database integration in Phase 5.
 
+---
+
+## ✅ Phase 5: Backend Integration (Listings CRUD with API & DB)
+
+### 📛 Database Integration with Prisma
+- Setup real `POST /api/listings` route in Express.
+- Created listing in DB with real `userId`, `createdAt`, `id` via Prisma.
+- Verified creation via Postman and database.
+
+### 🔍 Read Listings from Backend
+- Replaced Redux listing reads in `FeaturedListings` with `fetch("/api/listings")`.
+- Combined results with Fake Store API for fallback/placeholder listings.
+- Applied filters via query params.
+- Updated `next.config.js` with `placehold.co` as a valid image domain.
+
+### 📍 Dashboard Backend Integration
+- Modified `/dashboard` to fetch listings from API.
+- Filtered by `userId` to show current user's listings.
+- Removed Redux dependency for listings.
+
+### ✅ Listing Creation with API
+- `/post-item` now `POST`s to backend API instead of using Redux.
+- Fields: title, description, price, imageUrl, category, userId.
+- Redirects to dashboard after creation.
+
+### ✅ Listing Deletion
+- Implemented `DELETE /api/listings/:id` route in Express.
+- Hooked up Delete button in Dashboard.
+- Listings removed from database and UI upon success.
+
+### ✅ Listing Editing
+- Created `PUT /api/listings/:id` route in backend.
+- Created `/edit-item/:id` page:
+  - Fetches existing listing data from API
+  - Pre-fills form
+  - Updates backend on submit
+  - Redirects to dashboard
+
+### ✅ Phase Closure
+- Full CRUD support connected to backend:
+  - Create, Read, Update, Delete listings via REST API.
+- Removed Redux listing logic in favor of persistent backend.
+- Project is now fully database-driven for listings.
+- Next: **Phase 6 – External Integrations (eBay/Etsy), Search, Messaging, Payments**
 

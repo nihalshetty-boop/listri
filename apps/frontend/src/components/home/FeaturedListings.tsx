@@ -7,14 +7,16 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { userListings } from "@/lib/userListings";
 
 export type Listing = {
-  id: number | string;
+  id: string | number;
   title: string;
   price: number;
   imageUrl: string;
   category: string;
+  description?: string;
+  createdAt?: string;
+  userId?: string;
   source?: "user" | "api";
 };
 
@@ -27,30 +29,40 @@ export function FeaturedListings() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchAllListings = async () => {
       try {
-        const res = await fetch("https://fakestoreapi.com/products");
-        const data = await res.json();
+        const [backendRes, fakeStoreRes] = await Promise.all([
+          fetch("http://localhost:4000/api/listings"),
+          fetch("https://fakestoreapi.com/products"),
+        ]);
 
-        const normalizedApiListings: Listing[] = data.map((item: any) => ({
-          id: item.id,
+        const backendData: Listing[] = await backendRes.json();
+        const fakeStoreData = await fakeStoreRes.json();
+
+        const normalizedFakeStore: Listing[] = fakeStoreData.map((item: any) => ({
+          id: `f_${item.id}`,
           title: item.title,
           price: item.price,
           imageUrl: item.image,
           category: item.category,
-          source: "api",
+          description: item.description,
+          source: "api" as const,
         }));
 
-        const allListings = [...userListings, ...normalizedApiListings];
-        setListings(allListings);
+        const normalizedBackend = backendData.map((item) => ({
+          ...item,
+          source: "user" as const,
+        }));
+
+        setListings([...normalizedBackend, ...normalizedFakeStore]);
       } catch (err) {
-        console.error("Failed to fetch listings", err);
+        console.error("Error loading listings:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchListings();
+    fetchAllListings();
   }, []);
 
   const filteredListings = selectedCategory
@@ -91,7 +103,7 @@ export function FeaturedListings() {
           {filteredListings.map((item) => (
             <Link
               key={`${item.source}-${item.id}`}
-              href={`/listing/${item.id}`}
+              href={`/listing/${item.id.toString().replace("f_", "")}`}
               className="block hover:shadow-md transition"
             >
               <Card>

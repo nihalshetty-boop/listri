@@ -3,11 +3,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
 import { RootState } from "@/store";
-import { addListing } from "@/store/slices/listingsSlice";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +23,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function PostItemPage() {
   const { user } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
   const router = useRouter();
 
   const {
@@ -36,18 +33,32 @@ export default function PostItemPage() {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     if (!user) return;
 
     const newListing = {
       ...data,
-      id: uuidv4(),
       userId: user.id,
-      createdAt: new Date().toISOString(),
     };
 
-    dispatch(addListing(newListing));
-    router.push("/dashboard");
+    try {
+      const response = await fetch("http://localhost:4000/api/listings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newListing),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create listing");
+      }
+
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Failed to post listing:", err);
+      // Optionally show a user-facing error
+    }
   };
 
   return (

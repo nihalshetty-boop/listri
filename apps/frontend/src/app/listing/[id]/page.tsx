@@ -48,6 +48,24 @@ export default function ListingDetailPage() {
         return;
       }
 
+      try {
+        const backendRes = await fetch(`http://localhost:4000/api/listings`);
+        if (backendRes.ok) {
+          const allBackendListings = await backendRes.json();
+          const backendMatch = allBackendListings.find(
+            (item: any) => item.id.toString() === id
+          );
+
+          if (backendMatch) {
+            setListing({ ...backendMatch, source: "user" });
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch listing from backend:", error);
+      }
+
       // Finally, try to fetch from API
       try {
         const response = await fetch(`https://fakestoreapi.com/products/${id}`);
