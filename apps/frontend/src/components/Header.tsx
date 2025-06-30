@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, User, Menu, Home, Store } from "lucide-react";
+import { Search, Plus, User, Menu, Home, Store, MessageCircle } from "lucide-react";
 
 export default function Header() {
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
@@ -70,6 +70,14 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
+                {/* Messages Link */}
+                <Link href="/messages">
+                  <Button variant="ghost" className="text-gray-700 hover:text-blue-600 relative">
+                    <MessageCircle className="w-5 h-5" />
+                    <span className="hidden sm:block ml-2">Messages</span>
+                  </Button>
+                </Link>
+
                 {/* User Menu */}
                 <div className="relative group">
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors">

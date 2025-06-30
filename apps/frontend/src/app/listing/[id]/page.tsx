@@ -7,6 +7,9 @@ import { RootState } from "@/store";
 import Image from "next/image";
 import Link from "next/link";
 import { userListings } from "@/lib/userListings";
+import ChatWidget from "@/components/ChatWidget";
+import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 
 type UnifiedListing = {
   id: string | number;
@@ -24,9 +27,11 @@ export default function ListingDetailPage() {
   const { id } = useParams();
   const [listing, setListing] = useState<UnifiedListing | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Get listings from Redux store
   const reduxListings = useSelector((state: RootState) => state.listings.items);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     const findListing = async () => {
@@ -142,13 +147,29 @@ export default function ListingDetailPage() {
         </div>
       )}
 
-      <div>
-        <button
-          disabled
-          className="text-sm text-muted-foreground italic cursor-not-allowed"
-        >
-          Contact Seller (coming soon)
-        </button>
+      <div className="flex flex-col sm:flex-row gap-3">
+        {user ? (
+          <>
+            <Button
+              onClick={() => setIsChatOpen(true)}
+              className="flex-1"
+            >
+              Contact Seller
+            </Button>
+            <Link href="/messages">
+              <Button variant="outline" className="w-full sm:w-auto flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                View Messages
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <Link href="/login">
+            <Button variant="outline" className="w-full sm:w-auto">
+              Login to Contact Seller
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="mt-6">
@@ -156,6 +177,16 @@ export default function ListingDetailPage() {
           ← Back to Home
         </Link>
       </div>
+
+      {/* Chat Widget */}
+      <ChatWidget
+        listingId={listing.id.toString()}
+        sellerId={listing.userId || "unknown"}
+        sellerName={listing.userId || "Seller"}
+        listingTitle={listing.title}
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
     </section>
   );
 }
