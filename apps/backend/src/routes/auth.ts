@@ -83,4 +83,16 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 });
 
+// GET /users - list all users (for testing, no passwords)
+router.get('/users', async (_req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: { id: true, email: true, name: true, createdAt: true }
+    });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 export default router;

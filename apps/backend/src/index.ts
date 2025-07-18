@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth";
 import listingsRoutes from "./routes/listings";
+import ordersRoutes from "./routes/orders";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/api/listings", listingsRoutes);
+app.use("/api/orders", ordersRoutes);
 
 app.get("/", (_req, res) => {
   res.send("Listri Backend is running!");

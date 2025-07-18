@@ -1,8 +1,6 @@
 {
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/listing/[id]/page": "app/listing/[id]/page.js",
-  "/messages/page": "app/messages/page.js",
-  "/page": "app/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/login/page": "app/login/page.js",
-  "/chat/page": "app/chat/page.js"
+  "/register/page": "app/register/page.js",
+  "/page": "app/page.js"
 }

@@ -20,6 +20,7 @@ model User {
   password  String
   createdAt DateTime   @default(now())
   listings  Listing[]  @relation("UserListings") 
+  orders    Order[]
 }
 
 model Listing {
@@ -32,5 +33,26 @@ model Listing {
   createdAt   DateTime @default(now())
   userId      String
   user        User     @relation("UserListings", fields: [userId], references: [id]) 
+  orders      Order[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  listingId     String
+  listing       Listing     @relation(fields: [listingId], references: [id])
+  status        OrderStatus @default(PENDING)
+  priceAtOrder  Float
+  quantity      Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  RESERVED
+  PAID
+  CANCELLED
 }
 

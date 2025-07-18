@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import { ReduxProvider } from "@/components/ReduxProvider";
 import ChatProviderWrapper from "@/components/ChatProviderWrapper";
 import Header from "@/components/Header";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,12 +32,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen bg-gray-50">
-        <ReduxProvider>
-          <ChatProviderWrapper>
-            <Header />
-            <main className="min-h-screen">{children}</main>
-          </ChatProviderWrapper>
-        </ReduxProvider>
+        <SessionProviderWrapper>
+          <ReduxProvider>
+            <ChatProviderWrapper>
+              <Header />
+              {children}
+            </ChatProviderWrapper>
+          </ReduxProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
