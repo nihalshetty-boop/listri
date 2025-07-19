@@ -33,12 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen bg-gray-50">
         <SessionProviderWrapper>
-          <ReduxProvider>
-            <ChatProviderWrapper>
-              <Header />
+        <ReduxProvider>
+          <ChatProviderWrapper>
+            <Header />
               {children}
-            </ChatProviderWrapper>
-          </ReduxProvider>
+          </ChatProviderWrapper>
+        </ReduxProvider>
         </SessionProviderWrapper>
       </body>
     </html>

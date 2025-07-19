@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { registerUser } from "@/lib/api";
+import { registerUser } from "@/lib/api"; 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/slices/authSlice";
@@ -72,7 +72,7 @@ export default function RegisterPage() {
               <p className="text-gray-600">Whether you're selling electronics, clothing, services, or anything else - our platform adapts to your needs.</p>
             </div>
             
-            <div>
+        <div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Join millions of users</h3>
               <p className="text-gray-600">Connect with buyers and sellers in a trusted, secure marketplace environment with real-time messaging and payments.</p>
             </div>
@@ -100,7 +100,7 @@ export default function RegisterPage() {
               {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>}
             </div>
             
-            <div>
+        <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <Input 
                 type="email" 
@@ -109,9 +109,9 @@ export default function RegisterPage() {
                 {...register("email")} 
               />
               {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
-            </div>
+        </div>
             
-            <div>
+        <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <Input 
                 type="password" 

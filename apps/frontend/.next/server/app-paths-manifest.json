@@ -1,7 +1,11 @@
 {
-  "/dashboard/page": "app/dashboard/page.js",
+  "/faq/page": "app/faq/page.js",
+  "/disputes/page": "app/disputes/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/terms/page": "app/terms/page.js",
   "/page": "app/page.js",
-  "/messages/page": "app/messages/page.js",
-  "/about/page": "app/about/page.js",
-  "/login/page": "app/login/page.js"
+  "/community/page": "app/community/page.js",
+  "/cookies/page": "app/cookies/page.js",
+  "/privacy/page": "app/privacy/page.js",
+  "/feedback/page": "app/feedback/page.js"
 }

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { loginUser } from "@/lib/api";
+import { loginUser } from "@/lib/api"; 
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
@@ -74,7 +74,7 @@ export default function LoginPage() {
               <p className="text-gray-600">Secure payments, real-time messaging, and trusted marketplace features.</p>
             </div>
             
-            <div>
+        <div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Join our community</h3>
               <p className="text-gray-600">Connect with buyers and sellers in a safe, modern marketplace environment.</p>
             </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
               {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
             </div>
             
-            <div>
+        <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <Input 
                 type="password" 
