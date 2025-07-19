@@ -9,7 +9,9 @@ import Link from "next/link";
 import { userListings } from "@/lib/userListings";
 import ChatWidget from "@/components/ChatWidget";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MessageCircle, CreditCard, ArrowLeft, Tag, MapPin, Calendar, User } from "lucide-react";
+import { createOrder, createCheckoutSession } from "@/lib/api";
 
 type UnifiedListing = {
   id: string | number;
@@ -28,6 +30,7 @@ export default function ListingDetailPage() {
   const [listing, setListing] = useState<UnifiedListing | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   // Get listings from Redux store
   const reduxListings = useSelector((state: RootState) => state.listings.items);
@@ -102,91 +105,191 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <section className="max-w-4xl mx-auto px-4 py-12">
-        <p className="text-center">Loading...</p>
-      </section>
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading listing...</p>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (!listing) return notFound();
 
+  const handleBuyNow = async () => {
+    if (!user || !listing) return;
+    
+    setProcessingPayment(true);
+    try {
+      // Create order first
+      const order = await createOrder({
+        listingId: listing.id.toString(),
+        priceAtOrder: listing.price,
+        quantity: 1,
+        status: 'PENDING'
+      });
+
+      // Create checkout session
+      const { url } = await createCheckoutSession(order.id);
+      
+      // Redirect to Stripe checkout
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Failed to process payment. Please try again.');
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
   return (
-    <section className="max-w-4xl mx-auto px-4 py-12 space-y-6">
-      <div className="relative w-full h-64 sm:h-96 rounded overflow-hidden">
-        <Image
-          src={listing.imageUrl}
-          alt={listing.title}
-          layout="fill"
-          objectFit="cover"
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <div className="mb-8">
+          <Link href="/browse" className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Browse
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Image Section */}
+          <div>
+            <div className="relative w-full h-96 lg:h-[500px] rounded-lg overflow-hidden bg-white shadow-sm">
+              <Image
+                src={listing.imageUrl}
+                alt={listing.title}
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
+          </div>
+
+          {/* Details Section */}
+          <div className="space-y-8">
+            {/* Title and Price */}
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{listing.title}</h1>
+              <p className="text-4xl lg:text-5xl font-bold text-purple-600 mb-6">
+                ${listing.price.toFixed(2)}
+              </p>
+            </div>
+
+            {/* Category and Details */}
+            <Card className="bg-white shadow-sm border-0">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Tag className="w-5 h-5 text-gray-400 mr-3" />
+                    <span className="text-gray-600">Category:</span>
+                    <span className="ml-2 font-medium text-gray-900 capitalize">{listing.category}</span>
+                  </div>
+                  
+                  {listing.createdAt && (
+                    <div className="flex items-center">
+                      <Calendar className="w-5 h-5 text-gray-400 mr-3" />
+                      <span className="text-gray-600">Posted:</span>
+                      <span className="ml-2 font-medium text-gray-900">
+                        {new Date(listing.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {listing.userId && (
+                    <div className="flex items-center">
+                      <User className="w-5 h-5 text-gray-400 mr-3" />
+                      <span className="text-gray-600">Seller ID:</span>
+                      <span className="ml-2 font-mono text-sm text-gray-900">{listing.userId}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Description */}
+            {listing.description && (
+              <Card className="bg-white shadow-sm border-0">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-900">Description</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed">{listing.description}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Action Buttons */}
+            <div className="space-y-4">
+              {user ? (
+                <>
+                  {/* Only show Buy Now button for listings in our database */}
+                  {listing.source === "user" && (
+                    <Button
+                      onClick={handleBuyNow}
+                      disabled={processingPayment}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-6 rounded-lg font-medium text-lg flex items-center justify-center space-x-2"
+                    >
+                      {processingPayment ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5" />
+                          <span>Buy Now</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  
+                  <Button
+                    onClick={() => setIsChatOpen(true)}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-lg font-medium text-lg flex items-center justify-center space-x-2"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span>Contact Seller</span>
+                  </Button>
+                  
+                  <Link href="/messages">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 py-4 px-6 rounded-lg font-medium text-lg flex items-center justify-center space-x-2"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                      <span>View Messages</span>
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <Link href="/login">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-purple-300 text-purple-600 hover:bg-purple-50 py-4 px-6 rounded-lg font-medium text-lg"
+                  >
+                    Login to Buy or Contact Seller
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Widget */}
+        <ChatWidget
+          listingId={listing.id.toString()}
+          sellerId={listing.userId || "unknown"}
+          sellerName={listing.userId || "Seller"}
+          listingTitle={listing.title}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
         />
       </div>
-
-      <div>
-        <h1 className="text-3xl font-bold">{listing.title}</h1>
-        <p className="text-muted-foreground text-sm">{listing.category}</p>
-        <p className="text-xl font-semibold mt-2">${listing.price.toFixed(2)}</p>
-      </div>
-
-      {listing.description && (
-        <div>
-          <p className="text-sm text-muted-foreground">{listing.description}</p>
-        </div>
-      )}
-
-      {listing.createdAt && (
-        <div>
-          <p className="text-sm">Posted on: {new Date(listing.createdAt).toLocaleDateString()}</p>
-        </div>
-      )}
-
-      {listing.userId && (
-        <div>
-          <p className="text-sm">
-            Seller ID: <span className="font-mono text-muted-foreground">{listing.userId}</span>
-          </p>
-        </div>
-      )}
-
-      <div className="flex flex-col sm:flex-row gap-3">
-        {user ? (
-          <>
-            <Button
-              onClick={() => setIsChatOpen(true)}
-              className="flex-1"
-            >
-              Contact Seller
-            </Button>
-            <Link href="/messages">
-              <Button variant="outline" className="w-full sm:w-auto flex items-center gap-2">
-                <MessageCircle className="w-4 h-4" />
-                View Messages
-              </Button>
-            </Link>
-          </>
-        ) : (
-          <Link href="/login">
-            <Button variant="outline" className="w-full sm:w-auto">
-              Login to Contact Seller
-            </Button>
-          </Link>
-        )}
-      </div>
-
-      <div className="mt-6">
-        <Link href="/" className="text-sm underline text-blue-600 hover:text-blue-800">
-          ← Back to Home
-        </Link>
-      </div>
-
-      {/* Chat Widget */}
-      <ChatWidget
-        listingId={listing.id.toString()}
-        sellerId={listing.userId || "unknown"}
-        sellerName={listing.userId || "Seller"}
-        listingTitle={listing.title}
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-      />
-    </section>
+    </div>
   );
 }

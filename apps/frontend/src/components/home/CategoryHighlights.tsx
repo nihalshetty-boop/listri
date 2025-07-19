@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Smartphone,
   Monitor,
@@ -14,6 +16,7 @@ import {
   Camera,
   Music,
   Gamepad2,
+  ArrowRight,
 } from "lucide-react";
 
 type Category = {
@@ -113,46 +116,49 @@ const categories: Category[] = [
 
 export function CategoryHighlights() {
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Browse by Category
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Find exactly what you're looking for by exploring our curated categories
           </p>
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               href={`/?category=${cat.id}`}
               className="group"
             >
-              <div className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200 border border-gray-100 group-hover:border-gray-200">
-                <div className={`flex justify-center items-center h-16 w-16 mx-auto mb-4 rounded-full ${cat.bgColor} group-hover:scale-110 transition-transform duration-200`}>
-                  <div className={cat.color}>
-                    {cat.icon}
+              <Card className="bg-white shadow-sm border-0 hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-6 text-center">
+                  <div className={`flex justify-center items-center h-16 w-16 mx-auto mb-4 rounded-lg ${cat.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                    <div className={cat.color}>
+                      {cat.icon}
+                    </div>
                   </div>
-                </div>
-                <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                  {cat.name}
-                </p>
-              </div>
+                  <p className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+                    {cat.name}
+                  </p>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>
 
         {/* Browse All Button */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-16">
           <Link href="/categories">
-            <button className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full font-semibold transition-colors">
-              Browse All Categories
-            </button>
+            <Button variant="outline" className="border-purple-300 text-purple-600 hover:bg-purple-50 px-8 py-4 rounded-lg font-medium text-base flex items-center space-x-2">
+              <span>Browse All Categories</span>
+              <ArrowRight className="w-5 h-5" />
+            </Button>
           </Link>
         </div>
       </div>

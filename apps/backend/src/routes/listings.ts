@@ -2,6 +2,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import fetch from 'node-fetch';
+import { authenticateToken } from "../middleware/auth";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -9,7 +10,7 @@ const prisma = new PrismaClient();
 const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL || 'http://localhost:8082';
 const SEARCH_SERVICE_SECRET = process.env.SEARCH_SERVICE_SECRET || 'changeme';
 
-// GET /api/listings - fetch all listings
+// GET /api/listings - fetch all listings (public)
 router.get("/", async (req, res) => {
   try {
     const listings = await prisma.listing.findMany({
@@ -22,7 +23,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Proxy search endpoint
+// Proxy search endpoint (public)
 router.get('/search', async (req, res) => {
   const q = req.query.q;
   if (!q) return res.status(400).json({ error: "Missing 'q' parameter" });
@@ -58,9 +59,11 @@ async function indexListing(listing: any) {
   }
 }
 
-// POST /api/listings - create a new listing
-router.post("/", async (req, res) => {
-  const { title, description, price, imageUrl, category, userId } = req.body;
+// POST /api/listings - create a new listing (protected)
+router.post("/", authenticateToken, async (req, res) => {
+  const { title, description, price, imageUrl, category } = req.body;
+  const userId = req.user!.userId; // From auth middleware
+
   try {
     const newListing = await prisma.listing.create({
       data: { title, description, price, imageUrl, category, userId },
@@ -74,11 +77,26 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT /api/listings/:id - update a listing
-router.put("/:id", async (req, res) => {
+// PUT /api/listings/:id - update a listing (protected, owner only)
+router.put("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { title, description, price, imageUrl, category } = req.body;
+  const userId = req.user!.userId;
+
   try {
+    // Check if listing exists and user owns it
+    const existingListing = await prisma.listing.findUnique({
+      where: { id },
+    });
+
+    if (!existingListing) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
+
+    if (existingListing.userId !== userId) {
+      return res.status(403).json({ error: "You can only update your own listings" });
+    }
+
     const updatedListing = await prisma.listing.update({
       where: { id },
       data: { title, description, price, imageUrl, category },
@@ -92,27 +110,25 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+// DELETE /api/listings/:id - delete a listing (protected, owner only)
+router.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { title, description, price, imageUrl, category } = req.body;
+  const userId = req.user!.userId;
 
   try {
-    const updated = await prisma.listing.update({
+    // Check if listing exists and user owns it
+    const existingListing = await prisma.listing.findUnique({
       where: { id },
-      data: { title, description, price, imageUrl, category },
     });
-    res.json(updated);
-  } catch (err) {
-    console.error("Error updating listing:", err);
-    res.status(500).json({ error: "Failed to update listing" });
-  }
-});
 
-// DELETE /api/listings/:id - delete a listing
-router.delete("/:id", async (req, res) => {
-  const { id } = req.params;
+    if (!existingListing) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
 
-  try {
+    if (existingListing.userId !== userId) {
+      return res.status(403).json({ error: "You can only delete your own listings" });
+    }
+
     const deleted = await prisma.listing.delete({
       where: { id },
     });

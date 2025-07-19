@@ -6,8 +6,9 @@ import { RootState } from "@/store";
 import { useChatSocket, ChatMessage } from "../../../hooks/useChatSocket";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ChatConnectionStatus from "@/components/ChatConnectionStatus";
+import { MessageSquare, Send, User, Clock } from "lucide-react";
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -148,158 +149,175 @@ export default function MessagesPage() {
     }
   };
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Messages</h1>
-        <ChatConnectionStatus
-          connectionStatus={connectionStatus}
-          isConnected={isConnected}
-          isConnecting={isConnecting}
-          hasError={hasError}
-          onReconnect={reconnect}
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[600px]">
-        {/* Conversations List */}
-        <Card className="lg:col-span-1">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold">Conversations</h2>
-          </div>
-          <div className="overflow-y-auto h-[calc(100%-4rem)]">
-            {conversations.size === 0 ? (
-              <div className="p-4 text-center text-gray-500">
-                {connectionStatus === "connected" 
-                  ? "No conversations yet. Start chatting!"
-                  : "Connecting to chat service..."
-                }
-              </div>
-            ) : (
-              Array.from(conversations.keys()).map((conversationId) => (
-                <div
-                  key={conversationId}
-                  className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                    selectedConversation === conversationId ? "bg-blue-50 border-blue-200" : ""
-                  }`}
-                  onClick={() => setSelectedConversation(conversationId)}
-                >
-                  <div className="font-medium text-sm">
-                    {getConversationDisplayName(conversationId)}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {conversations.get(conversationId)?.length || 0} messages
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </Card>
+  if (!isClient) {
+    return null;
+  }
 
-        {/* Chat Messages */}
-        <div className="lg:col-span-3">
-          <Card className="h-full flex flex-col">
-            {selectedConversation ? (
-              <>
-                <div className="p-4 border-b">
-                  <h2 className="text-lg font-semibold">
-                    {getConversationDisplayName(selectedConversation)}
-                  </h2>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <div className={`w-2 h-2 rounded-full ${
-                      connectionStatus === "connected" ? "bg-green-500" : 
-                      connectionStatus === "connecting" ? "bg-yellow-500" : 
-                      connectionStatus === "error" ? "bg-red-500" : "bg-gray-500"
-                    }`}></div>
-                    <span className={`text-xs ${getConnectionStatusColor()}`}>
-                      {getConnectionStatusText()}
-                    </span>
-                  </div>
+  return (
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-12">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Messages</h1>
+            <p className="text-xl text-gray-600">Connect with buyers and sellers</p>
+          </div>
+          <ChatConnectionStatus
+            connectionStatus={connectionStatus}
+            isConnected={isConnected}
+            isConnecting={isConnecting}
+            hasError={hasError}
+            onReconnect={reconnect}
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 h-[600px]">
+          {/* Conversations List */}
+          <Card className="lg:col-span-1 bg-white shadow-sm border-0">
+            <CardHeader className="border-b border-gray-200">
+              <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                <MessageSquare className="w-5 h-5 mr-2" />
+                Conversations
+              </CardTitle>
+            </CardHeader>
+            <div className="overflow-y-auto h-[calc(100%-4rem)]">
+              {conversations.size === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  {connectionStatus === "connected" 
+                    ? (
+                      <div>
+                        <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <p className="text-sm">No conversations yet</p>
+                        <p className="text-xs mt-1">Start chatting with sellers!</p>
+                      </div>
+                    )
+                    : (
+                      <div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                        <p className="text-sm">Connecting to chat service...</p>
+                      </div>
+                    )
+                  }
                 </div>
-                
-                <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                  {getCurrentConversationMessages().length === 0 ? (
-                    <div className="text-center text-gray-500 py-8">
-                      No messages in this conversation yet.
+              ) : (
+                Array.from(conversations.keys()).map((conversationId) => (
+                  <div
+                    key={conversationId}
+                    className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
+                      selectedConversation === conversationId ? "bg-purple-50 border-purple-200" : ""
+                    }`}
+                    onClick={() => setSelectedConversation(conversationId)}
+                  >
+                    <div className="font-medium text-sm text-gray-900">
+                      {getConversationDisplayName(conversationId)}
                     </div>
-                  ) : (
-                    getCurrentConversationMessages().map((msg, idx) => (
-                      <div
-                        key={msg.id || idx}
-                        className={`flex ${
-                          msg.senderId === userId ? "justify-end" : "justify-start"
-                        }`}
-                      >
+                    <div className="text-xs text-gray-500 mt-1">
+                      {conversations.get(conversationId)?.length || 0} messages
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
+
+          {/* Chat Messages */}
+          <div className="lg:col-span-3">
+            <Card className="h-full flex flex-col bg-white shadow-sm border-0">
+              {selectedConversation ? (
+                <>
+                  <CardHeader className="border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-gray-900">
+                        {getConversationDisplayName(selectedConversation)}
+                      </CardTitle>
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          connectionStatus === "connected" ? "bg-green-500" : 
+                          connectionStatus === "connecting" ? "bg-yellow-500" : 
+                          connectionStatus === "error" ? "bg-red-500" : "bg-gray-500"
+                        }`}></div>
+                        <span className={`text-xs ${getConnectionStatusColor()}`}>
+                          {getConnectionStatusText()}
+                        </span>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {getCurrentConversationMessages().length === 0 ? (
+                      <div className="text-center text-gray-500 py-12">
+                        <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <p className="text-sm">No messages in this conversation yet.</p>
+                        <p className="text-xs mt-1">Start the conversation!</p>
+                      </div>
+                    ) : (
+                      getCurrentConversationMessages().map((msg, idx) => (
                         <div
-                          className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                            msg.senderId === userId
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-200 text-gray-800"
+                          key={msg.id || idx}
+                          className={`flex ${
+                            msg.senderId === userId ? "justify-end" : "justify-start"
                           }`}
                         >
-                          <div className="font-medium text-xs mb-1">
-                            {msg.senderName}
-                          </div>
-                          <div>{msg.content}</div>
-                          {msg.timestamp && (
-                            <div className="text-xs opacity-70 mt-1">
-                              {new Date(msg.timestamp).toLocaleTimeString()}
+                          <div
+                            className={`max-w-xs px-4 py-3 rounded-lg text-sm ${
+                              msg.senderId === userId
+                                ? "bg-purple-600 text-white"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="font-medium text-xs flex items-center">
+                                <User className="w-3 h-3 mr-1" />
+                                {msg.senderName}
+                              </div>
+                              {msg.timestamp && (
+                                <div className="text-xs opacity-70 flex items-center">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {new Date(msg.timestamp).toLocaleTimeString()}
+                                </div>
+                              )}
                             </div>
-                          )}
+                            <div className="leading-relaxed">{msg.content}</div>
+                          </div>
                         </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                <div className="p-4 border-t">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder={
-                        connectionStatus === "connected" 
-                          ? "Type your message..." 
-                          : "Connecting..."
-                      }
-                      disabled={!isConnected || isConnecting}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={handleSend}
-                      disabled={!input.trim() || !isConnected || isConnecting || !selectedConversation}
-                    >
-                      Send
-                    </Button>
+                      ))
+                    )}
+                  </div>
+                  
+                  <div className="border-t border-gray-200 p-4">
+                    <div className="flex space-x-3">
+                      <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Type your message..."
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        disabled={!isConnected}
+                      />
+                      <Button
+                        onClick={handleSend}
+                        disabled={!isConnected || !input.trim()}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
+                      >
+                        <Send className="w-4 h-4" />
+                        <span>Send</span>
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center text-gray-500">
+                    <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
+                    <p className="text-sm">Choose a conversation from the list to start messaging</p>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <div className="text-lg font-medium mb-2">Select a conversation</div>
-                  <div className="text-sm">
-                    Choose a conversation from the list to start chatting
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
+              )}
+            </Card>
+          </div>
         </div>
       </div>
-
-      {/* Debug Info */}
-      {isClient && (
-        <div className="mt-6 p-4 bg-gray-100 rounded text-xs">
-          <div className="font-medium mb-2">Debug Info:</div>
-          <div>Total messages: {messages.length}</div>
-          <div>Conversations: {conversations.size}</div>
-          <div>Connection: {connectionStatus}</div>
-          <div>User ID: {userId}</div>
-          <div>Selected conversation: {selectedConversation || "None"}</div>
-        </div>
-      )}
     </div>
   );
 } 

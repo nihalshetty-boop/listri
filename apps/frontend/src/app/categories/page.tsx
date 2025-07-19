@@ -15,8 +15,11 @@ import {
   Music,
   Gamepad2,
   ArrowRight,
+  Search,
+  Plus,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type Category = {
   id: string;
@@ -154,7 +157,7 @@ const categories: Category[] = [
 
 export default function CategoriesPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -168,14 +171,14 @@ export default function CategoriesPage() {
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {categories.map((category) => (
             <Link key={category.id} href={`/browse?category=${category.id}`}>
-              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
+              <Card className="bg-white shadow-sm border-0 hover:shadow-md transition-shadow duration-200 cursor-pointer group">
                 <CardContent className="p-6">
                   {/* Category Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`flex items-center justify-center h-16 w-16 rounded-full ${category.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className={`flex items-center justify-center h-16 w-16 rounded-lg ${category.bgColor} group-hover:scale-110 transition-transform duration-200`}>
                       <div className={category.color}>
                         {category.icon}
                       </div>
@@ -184,26 +187,26 @@ export default function CategoriesPage() {
                   </div>
 
                   {/* Category Info */}
-                  <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
                       {category.name}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-3">
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
                       {category.description}
                     </p>
-                    <p className="text-sm font-medium text-blue-600">
+                    <p className="text-sm font-medium text-purple-600">
                       {category.listingCount.toLocaleString()} listings
                     </p>
                   </div>
 
                   {/* Popular Items */}
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-2">Popular items:</p>
-                    <div className="flex flex-wrap gap-1">
+                    <p className="text-xs font-medium text-gray-500 mb-3">Popular items:</p>
+                    <div className="flex flex-wrap gap-2">
                       {category.popularItems.slice(0, 3).map((item, index) => (
                         <span
                           key={index}
-                          className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                          className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full"
                         >
                           {item}
                         </span>
@@ -222,26 +225,30 @@ export default function CategoriesPage() {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Can't find what you're looking for?
-          </h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Browse all listings or post your own item to sell. Our community is always growing with new items being added daily.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/browse">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition-colors">
-                Browse All Listings
-              </button>
-            </Link>
-            <Link href="/post-item">
-              <button className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full font-semibold transition-colors">
-                Start Selling
-              </button>
-            </Link>
-          </div>
-        </div>
+        <Card className="bg-white shadow-sm border-0">
+          <CardContent className="p-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Can't find what you're looking for?
+            </h2>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto text-lg">
+              Browse all listings or post your own item to sell. Our community is always growing with new items being added daily.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/browse">
+                <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-medium text-base flex items-center space-x-2">
+                  <Search className="w-5 h-5" />
+                  <span>Browse All Listings</span>
+                </Button>
+              </Link>
+              <Link href="/post-item">
+                <Button variant="outline" className="border-purple-300 text-purple-600 hover:bg-purple-50 px-8 py-3 rounded-lg font-medium text-base flex items-center space-x-2">
+                  <Plus className="w-5 h-5" />
+                  <span>Start Selling</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
