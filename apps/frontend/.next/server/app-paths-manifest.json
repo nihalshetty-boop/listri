@@ -1,11 +1,9 @@
 {
-  "/faq/page": "app/faq/page.js",
-  "/disputes/page": "app/disputes/page.js",
-  "/contact/page": "app/contact/page.js",
-  "/terms/page": "app/terms/page.js",
   "/page": "app/page.js",
-  "/community/page": "app/community/page.js",
-  "/cookies/page": "app/cookies/page.js",
-  "/privacy/page": "app/privacy/page.js",
-  "/feedback/page": "app/feedback/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/messages/page": "app/messages/page.js",
+  "/safety/page": "app/safety/page.js",
+  "/how-it-works/page": "app/how-it-works/page.js",
+  "/post-item/page": "app/post-item/page.js"
 }
