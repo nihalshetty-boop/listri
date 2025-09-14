@@ -353,4 +353,4 @@ cd apps/services/chat
 
 ## Support
 
-For support and questions, please open an issue in the GitHub repository or contact the development team. 
+For support and questions, please open an issue in the GitHub repository or contact the development team. page

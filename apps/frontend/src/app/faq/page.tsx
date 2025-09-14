@@ -22,7 +22,7 @@ export default function FAQPage() {
     {
       category: "Account & Profile",
       question: "How do I create an account?",
-      answer: "You can create an account by clicking 'Register' in the top navigation. You can sign up with your email and password, or use Google/GitHub OAuth for quick registration."
+      answer: "You can create an account by clicking 'Register' in the top navigation. You can sign up with your email and password, or use Google OAuth for quick registration."
     },
     {
       category: "Account & Profile",

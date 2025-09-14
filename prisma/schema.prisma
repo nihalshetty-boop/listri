@@ -17,6 +17,15 @@ model User {
   id        String     @id @default(cuid())
   email     String     @unique
   name      String
+  // Profile fields
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+  age       Int?
+  city      String?
+  country   String?
+  bio       String?
+  profileCompleted Boolean @default(false)
   password  String
   createdAt DateTime   @default(now())
   listings  Listing[]  @relation("UserListings") 
@@ -28,9 +37,22 @@ model Listing {
   title       String
   description String
   price       Float
+  originalPrice Float?
   imageUrl    String
   category    String
+  condition   String?  @default("good")
+  location    String?
+  city        String?
+  state       String?
+  buyingMethod String? @default("both") // pickup, shipping, both
+  negotiable  Boolean  @default(false)
+  isSold      Boolean  @default(false)
+  soldDate    DateTime?
+  soldPrice   Float?
+  views       Int      @default(0)
+  favorites   Int      @default(0)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   userId      String
   user        User     @relation("UserListings", fields: [userId], references: [id]) 
   orders      Order[]

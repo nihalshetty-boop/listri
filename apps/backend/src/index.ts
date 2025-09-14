@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth";
 import listingsRoutes from "./routes/listings";
 import ordersRoutes from "./routes/orders";
 import paymentsRoutes from "./routes/payments";
+import profileRoutes from "./routes/profile";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use("/auth", authRoutes);
 app.use("/api/listings", listingsRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/payments", paymentsRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.get("/", (_req, res) => {
   res.send("Listri Backend is running!");

@@ -4,104 +4,77 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, notFound } from "next/navigation";
 import { RootState } from "@/store";
-import Image from "next/image";
 import Link from "next/link";
-import { userListings } from "@/lib/userListings";
-import ChatWidget from "@/components/ChatWidget";
+import EnhancedChatWidget from "@/components/EnhancedChatWidget";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, CreditCard, ArrowLeft, Tag, MapPin, Calendar, User } from "lucide-react";
-import { createOrder, createCheckoutSession } from "@/lib/api";
+import { MessageCircle, CreditCard, ArrowLeft, Tag, MapPin, Calendar, User, Eye, Heart } from "lucide-react";
+import { createOrder, createCheckoutSession, getListings } from "@/lib/api";
+import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 
-type UnifiedListing = {
-  id: string | number;
+type Listing = {
+  id: string;
   title: string;
-  description?: string;
+  description: string;
   price: number;
+  originalPrice?: number;
   imageUrl: string;
   category: string;
-  userId?: string;
-  createdAt?: string;
-  source?: "user" | "api";
+  condition?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  buyingMethod?: string;
+  negotiable: boolean;
+  isSold: boolean;
+  views: number;
+  favorites: number;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    city?: string;
+    country?: string;
+    avatarUrl?: string;
+  };
 };
 
 export default function ListingDetailPage() {
   const { id } = useParams();
-  const [listing, setListing] = useState<UnifiedListing | null>(null);
+  const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
 
-  // Get listings from Redux store
-  const reduxListings = useSelector((state: RootState) => state.listings.items);
   const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
-    const findListing = async () => {
-      // First, check Redux store
-      let foundListing = reduxListings.find((item) => item.id.toString() === id);
-      
-      if (foundListing) {
-        setListing(foundListing);
-        setLoading(false);
-        return;
-      }
-
-      // Then check userListings
-      const userListing = userListings.find((item) => item.id.toString() === id);
-      
-      if (userListing) {
-        setListing(userListing);
-        setLoading(false);
-        return;
-      }
-
+    const fetchListing = async () => {
       try {
-        const backendRes = await fetch(`http://localhost:4000/api/listings`);
-        if (backendRes.ok) {
-          const allBackendListings = await backendRes.json();
-          const backendMatch = allBackendListings.find(
-            (item: any) => item.id.toString() === id
-          );
-
-          if (backendMatch) {
-            setListing({ ...backendMatch, source: "user" });
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch listing from backend:", error);
-      }
-
-      // Finally, try to fetch from API
-      try {
-        const response = await fetch(`https://fakestoreapi.com/products/${id}`);
-        if (response.ok) {
-          const apiListing = await response.json();
-          const normalizedListing: UnifiedListing = {
-            id: apiListing.id,
-            title: apiListing.title,
-            description: apiListing.description,
-            price: apiListing.price,
-            imageUrl: apiListing.image,
-            category: apiListing.category,
-            source: "api",
-          };
-          setListing(normalizedListing);
+        setLoading(true);
+        const allListings = await getListings();
+        const foundListing = allListings.find((item) => item.id === id);
+        
+        if (foundListing) {
+          setListing(foundListing);
         } else {
           setListing(null);
         }
       } catch (error) {
-        console.error("Failed to fetch listing from API:", error);
+        console.error("Failed to fetch listing:", error);
         setListing(null);
       } finally {
         setLoading(false);
       }
     };
 
-    findListing();
-  }, [id, reduxListings]);
+    fetchListing();
+  }, [id]);
 
   if (loading) {
     return (
@@ -161,11 +134,12 @@ export default function ListingDetailPage() {
           {/* Image Section */}
           <div>
             <div className="relative w-full h-96 lg:h-[500px] rounded-lg overflow-hidden bg-white shadow-sm">
-              <Image
+              <ImageWithFallback
                 src={listing.imageUrl}
                 alt={listing.title}
-                layout="fill"
+                fill
                 objectFit="cover"
+                className="rounded-lg"
               />
             </div>
           </div>
@@ -175,9 +149,33 @@ export default function ListingDetailPage() {
             {/* Title and Price */}
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{listing.title}</h1>
-              <p className="text-4xl lg:text-5xl font-bold text-purple-600 mb-6">
-                ${listing.price.toFixed(2)}
-              </p>
+              <div className="flex items-center space-x-4 mb-6">
+                <p className="text-4xl lg:text-5xl font-bold text-purple-600">
+                  ${listing.price.toFixed(2)}
+                </p>
+                {listing.originalPrice && listing.originalPrice > listing.price && (
+                  <p className="text-2xl lg:text-3xl font-medium text-gray-500 line-through">
+                    ${listing.originalPrice.toFixed(2)}
+                  </p>
+                )}
+              </div>
+              
+              {/* Engagement Stats */}
+              <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
+                <div className="flex items-center space-x-1">
+                  <Eye className="w-4 h-4" />
+                  <span>{listing.views} views</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Heart className="w-4 h-4" />
+                  <span>{listing.favorites} favorites</span>
+                </div>
+                {listing.condition && (
+                  <span className="capitalize bg-gray-100 px-2 py-1 rounded text-xs">
+                    {listing.condition}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Category and Details */}
@@ -190,23 +188,47 @@ export default function ListingDetailPage() {
                     <span className="ml-2 font-medium text-gray-900 capitalize">{listing.category}</span>
                   </div>
                   
-                  {listing.createdAt && (
+                  <div className="flex items-center">
+                    <Calendar className="w-5 h-5 text-gray-400 mr-3" />
+                    <span className="text-gray-600">Posted:</span>
+                    <span className="ml-2 font-medium text-gray-900">
+                      {new Date(listing.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <MapPin className="w-5 h-5 text-gray-400 mr-3" />
+                    <span className="text-gray-600">Location:</span>
+                    <span className="ml-2 font-medium text-gray-900">
+                      {listing.location || listing.city || 'Location not specified'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <User className="w-5 h-5 text-gray-400 mr-3" />
+                    <span className="text-gray-600">Seller:</span>
+                    <span className="ml-2 font-medium text-gray-900">
+                      {listing.user.firstName && listing.user.lastName 
+                        ? `${listing.user.firstName} ${listing.user.lastName}`
+                        : listing.user.name}
+                    </span>
+                  </div>
+                  
+                  {listing.buyingMethod && (
                     <div className="flex items-center">
-                      <Calendar className="w-5 h-5 text-gray-400 mr-3" />
-                      <span className="text-gray-600">Posted:</span>
-                      <span className="ml-2 font-medium text-gray-900">
-                        {new Date(listing.createdAt).toLocaleDateString()}
+                      <span className="text-gray-600">Buying Method:</span>
+                      <span className="ml-2 font-medium text-gray-900 capitalize">
+                        {listing.buyingMethod}
                       </span>
                     </div>
                   )}
                   
-                  {listing.userId && (
-                    <div className="flex items-center">
-                      <User className="w-5 h-5 text-gray-400 mr-3" />
-                      <span className="text-gray-600">Seller ID:</span>
-                      <span className="ml-2 font-mono text-sm text-gray-900">{listing.userId}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center">
+                    <span className="text-gray-600">Negotiable:</span>
+                    <span className="ml-2 font-medium text-gray-900">
+                      {listing.negotiable ? 'Yes' : 'No'}
+                    </span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -227,8 +249,7 @@ export default function ListingDetailPage() {
             <div className="space-y-4">
               {user ? (
                 <>
-                  {/* Only show Buy Now button for listings in our database */}
-                  {listing.source === "user" && (
+                  {!listing.isSold && (
                     <Button
                       onClick={handleBuyNow}
                       disabled={processingPayment}
@@ -246,6 +267,12 @@ export default function ListingDetailPage() {
                         </>
                       )}
                     </Button>
+                  )}
+                  
+                  {listing.isSold && (
+                    <div className="w-full bg-gray-100 text-gray-600 py-4 px-6 rounded-lg font-medium text-lg text-center">
+                      This item has been sold
+                    </div>
                   )}
                   
                   <Button
@@ -280,12 +307,10 @@ export default function ListingDetailPage() {
           </div>
         </div>
 
-        {/* Chat Widget */}
-        <ChatWidget
-          listingId={listing.id.toString()}
-          sellerId={listing.userId || "unknown"}
-          sellerName={listing.userId || "Seller"}
-          listingTitle={listing.title}
+        {/* Enhanced Chat Widget */}
+        <EnhancedChatWidget
+          listing={listing}
+          sellerId={listing.userId}
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}
         />

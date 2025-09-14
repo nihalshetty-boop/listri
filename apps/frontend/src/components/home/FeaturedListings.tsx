@@ -2,23 +2,44 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { MapPin, Clock, Heart, Tag, ArrowRight } from "lucide-react";
+import { getListings } from "@/lib/api";
+import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 
 export type Listing = {
-  id: string | number;
+  id: string;
   title: string;
   price: number;
+  originalPrice?: number;
   imageUrl: string;
   category: string;
-  description?: string;
-  createdAt?: string;
-  userId?: string;
-  source?: "user" | "api";
+  description: string;
+  condition?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  buyingMethod?: string;
+  negotiable: boolean;
+  isSold: boolean;
+  views: number;
+  favorites: number;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    city?: string;
+    country?: string;
+    avatarUrl?: string;
+  };
 };
 
 export function FeaturedListings() {
@@ -30,40 +51,20 @@ export function FeaturedListings() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchAllListings = async () => {
+    const fetchListings = async () => {
       try {
-        const [backendRes, fakeStoreRes] = await Promise.all([
-          fetch("http://localhost:4000/api/listings"),
-          fetch("https://fakestoreapi.com/products"),
-        ]);
-
-        const backendData: Listing[] = await backendRes.json();
-        const fakeStoreData = await fakeStoreRes.json();
-
-        const normalizedFakeStore: Listing[] = fakeStoreData.map((item: any) => ({
-          id: `f_${item.id}`,
-          title: item.title,
-          price: item.price,
-          imageUrl: item.image,
-          category: item.category,
-          description: item.description,
-          source: "api" as const,
-        }));
-
-        const normalizedBackend = backendData.map((item) => ({
-          ...item,
-          source: "user" as const,
-        }));
-
-        setListings([...normalizedBackend, ...normalizedFakeStore]);
-      } catch (err) {
-        console.error("Error loading listings:", err);
+        setLoading(true);
+        const data = await getListings();
+        setListings(data);
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+        setListings([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAllListings();
+    fetchListings();
   }, []);
 
   const filteredListings = selectedCategory
@@ -128,19 +129,20 @@ export function FeaturedListings() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredListings.map((item) => (
               <Link
-                key={`${item.source}-${item.id}`}
-                href={`/listing/${item.id.toString().replace("f_", "")}`}
+                key={item.id}
+                href={`/listing/${item.id}`}
                 className="group"
               >
                 <Card className="bg-white shadow-sm border-0 hover:shadow-md transition-shadow duration-200">
                   <CardContent className="p-0">
                     {/* Image Container */}
                     <div className="relative aspect-square overflow-hidden rounded-t-lg">
-                      <Image
+                      <ImageWithFallback
                         src={item.imageUrl}
                         alt={item.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        objectFit="cover"
                       />
                       <div className="absolute top-4 right-4">
                         <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors shadow-sm">
@@ -162,18 +164,32 @@ export function FeaturedListings() {
                       </h3>
                       <div className="text-2xl font-bold text-gray-900 mb-4">
                         ${item.price.toFixed(2)}
+                        {item.originalPrice && item.originalPrice > item.price && (
+                          <span className="text-sm text-gray-500 line-through ml-2">
+                            ${item.originalPrice.toFixed(2)}
+                          </span>
+                        )}
                       </div>
                       
                       {/* Location and Time */}
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4" />
-                          <span>Local pickup</span>
+                          <span>{item.location || item.city || 'Location not specified'}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Clock className="w-4 h-4" />
-                          <span>2 hours ago</span>
+                          <span>{new Date(item.createdAt).toLocaleDateString()}</span>
                         </div>
+                      </div>
+                      
+                      {/* Additional Info */}
+                      <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+                        <span>{item.views} views</span>
+                        <span>{item.favorites} favorites</span>
+                        {item.condition && (
+                          <span className="capitalize">{item.condition}</span>
+                        )}
                       </div>
                     </div>
                   </CardContent>

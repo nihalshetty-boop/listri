@@ -27,20 +27,7 @@ export function HeroSection() {
             </p>
           </div>
 
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12">
-            <div className="relative">
-              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
-              <input
-                type="text"
-                placeholder="What are you looking for?"
-                className="w-full pl-16 pr-32 py-4 text-lg border-0 rounded-full focus:ring-4 focus:ring-white/20 focus:outline-none text-gray-900 placeholder-gray-500 bg-white shadow-lg"
-              />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-full font-medium">
-                Search
-              </Button>
-            </div>
-          </div>
+          
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">

@@ -1,9 +1,9 @@
 {
-  "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/profile/page": "app/profile/page.js",
-  "/messages/page": "app/messages/page.js",
-  "/safety/page": "app/safety/page.js",
-  "/how-it-works/page": "app/how-it-works/page.js",
-  "/post-item/page": "app/post-item/page.js"
+  "/register/page": "app/register/page.js",
+  "/page": "app/page.js",
+  "/profile/setup/page": "app/profile/setup/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
 }

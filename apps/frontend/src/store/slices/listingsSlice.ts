@@ -5,10 +5,31 @@ export type Listing = {
   title: string;
   description: string;
   price: number;
+  originalPrice?: number;
   imageUrl: string;
   category: string;
-  userId: string;
+  condition?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  buyingMethod?: string;
+  negotiable: boolean;
+  isSold: boolean;
+  views: number;
+  favorites: number;
   createdAt: string;
+  updatedAt: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    city?: string;
+    country?: string;
+    avatarUrl?: string;
+  };
 };
 
 type ListingsState = {
@@ -16,34 +37,16 @@ type ListingsState = {
 };
 
 const initialState: ListingsState = {
-  items: [
-    {
-      id: "l1",
-      title: "Bluetooth Speaker",
-      description: "Portable wireless speaker with deep bass.",
-      price: 45.0,
-      imageUrl: "/images/mock/bluetooth.png",
-      category: "electronics",
-      userId: "u1",
-      createdAt: "2024-05-01T12:00:00Z",
-    },
-    {
-      id: "l2",
-      title: "Handmade Bracelet",
-      description: "Elegant and minimal handcrafted bracelet.",
-      price: 20.0,
-      imageUrl: "/images/mock/bracelet.png",
-      category: "jewelery",
-      userId: "u2",
-      createdAt: "2024-05-03T14:30:00Z",
-    },
-  ],
+  items: [],
 };
 
 const listingsSlice = createSlice({
   name: "listings",
   initialState,
   reducers: {
+    setListings: (state, action: PayloadAction<Listing[]>) => {
+      state.items = action.payload;
+    },
     addListing: (state, action: PayloadAction<Listing>) => {
       state.items.push(action.payload);
     },
@@ -57,7 +60,7 @@ const listingsSlice = createSlice({
   },
 });
 
-export const { addListing, editListing, deleteListing } = listingsSlice.actions;
+export const { setListings, addListing, editListing, deleteListing } = listingsSlice.actions;
 export default listingsSlice.reducer;
 
 export const selectUserListings = (userId: string) => (state: { listings: ListingsState }) =>

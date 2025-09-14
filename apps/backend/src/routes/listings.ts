@@ -14,6 +14,20 @@ const SEARCH_SERVICE_SECRET = process.env.SEARCH_SERVICE_SECRET || 'changeme';
 router.get("/", async (req, res) => {
   try {
     const listings = await prisma.listing.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            city: true,
+            country: true,
+            avatarUrl: true,
+          }
+        }
+      },
       orderBy: { createdAt: "desc" },
     });
     res.json(listings);

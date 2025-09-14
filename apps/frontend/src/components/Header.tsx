@@ -7,6 +7,8 @@ import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { usePathname } from "next/navigation";
+import { getProfile } from "@/lib/api";
 import { 
   Search, 
   Plus, 
@@ -26,10 +28,34 @@ export default function Header() {
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [profileName, setProfileName] = useState<string>('');
+  const pathname = usePathname();
+  const hideAuthCtas = pathname === "/login" || pathname === "/register";
+
+  // TODO: wire these to real data sources
+  const messageCount = 0;
+  const notificationCount = 5; // Demo: showing 5 unread notifications
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Fetch profile name when user is logged in
+  useEffect(() => {
+    const fetchProfileName = async () => {
+      if (isLoggedIn && user) {
+        try {
+          const profile = await getProfile();
+          setProfileName(profile.name || '');
+        } catch (error) {
+          console.error('Error fetching profile name:', error);
+          setProfileName('');
+        }
+      }
+    };
+
+    fetchProfileName();
+  }, [isLoggedIn, user]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -83,16 +109,23 @@ export default function Header() {
 
             {!mounted ? null : !isLoggedIn ? (
               <div className="flex items-center space-x-3">
-                <Link href="/login">
-                  <Button variant="ghost" className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg font-medium">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm">
-                    Sign up
-                  </Button>
-                </Link>
+                {hideAuthCtas ? null : (
+                  <>
+                    <Link href="/login">
+                      <Button variant="ghost" className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg font-medium">
+                        Log in
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-purple-50 hover:text-purple-600 px-6 py-3 rounded-xl font-medium"
+                      >
+                        Sign up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             ) : (
               <div className="flex items-center space-x-4">
@@ -101,16 +134,21 @@ export default function Header() {
                   <Button variant="ghost" className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative px-4 py-2 rounded-lg">
                     <MessageCircle className="w-5 h-5" />
                     <span className="hidden sm:block ml-2 font-medium">Messages</span>
-                    {/* Notification Badge */}
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    {messageCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    )}
                   </Button>
                 </Link>
 
                 {/* Notifications */}
-                <Button variant="ghost" className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 p-2 rounded-lg relative">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full"></span>
-                </Button>
+                <Link href="/notifications">
+                  <Button variant="ghost" className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 p-2 rounded-lg relative">
+                    <Bell className="w-5 h-5" />
+                    {notificationCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full"></span>
+                    )}
+                  </Button>
+                </Link>
 
                 {/* User Menu */}
                 <div className="relative">
@@ -123,7 +161,7 @@ export default function Header() {
                     </div>
                     <div className="hidden sm:block text-left">
                       <div className="text-sm font-semibold text-gray-900">
-                        {user?.email?.split('@')[0] || 'User'}
+                        {profileName || user?.email?.split('@')[0] || 'User'}
                       </div>
                       <div className="text-xs text-gray-500">View Profile</div>
                     </div>
@@ -136,7 +174,7 @@ export default function Header() {
                       <CardContent className="p-2">
                         <div className="p-3 border-b border-gray-100">
                           <div className="text-sm font-semibold text-gray-900">
-                            {user?.email?.split('@')[0] || 'User'}
+                            {profileName || user?.email?.split('@')[0] || 'User'}
                           </div>
                           <div className="text-xs text-gray-500">{user?.email}</div>
                         </div>

@@ -52,6 +52,36 @@ export async function registerUser(data: {
   return result;
 }
 
+// Profile APIs
+export async function getProfile() {
+  const res = await fetch(`${API_BASE_URL}/api/profile`, {
+    headers: getAuthHeaders(),
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.error || "Failed to fetch profile");
+  return result;
+}
+
+export async function updateProfile(data: {
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  age?: number;
+  city?: string;
+  country?: string;
+  bio?: string;
+  profileCompleted?: boolean;
+}) {
+  const res = await fetch(`${API_BASE_URL}/api/profile`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.error || "Failed to update profile");
+  return result;
+}
+
 // Protected API functions
 export async function createListing(data: {
   title: string;
@@ -149,6 +179,14 @@ export async function getPaymentStatus(orderId: string) {
 
   const result = await res.json();
   if (!res.ok) throw new Error(result.error || "Failed to fetch payment status");
+  return result;
+}
+
+// Listings functions
+export async function getListings() {
+  const res = await fetch(`${API_BASE_URL}/api/listings`);
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.error || "Failed to fetch listings");
   return result;
 }
 
