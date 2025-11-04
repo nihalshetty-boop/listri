@@ -108,6 +108,7 @@ The application follows a microservices architecture with the following componen
 
 Before setting up the project, ensure you have the following installed:
 
+- **Docker** and **Docker Compose**
 - **Node.js** (v18 or higher)
 - **PostgreSQL** (v12 or higher)
 - **Java** (v11 or higher, for Spring Boot)
@@ -207,6 +208,18 @@ Once all services are running, you can access:
 - **Backend API:** http://localhost:4000
 - **Chat Service:** http://localhost:8081
 - **Chat Test Page:** http://localhost:3000/chat
+
+### Running with Docker
+
+Alternatively, you can run the entire application using Docker Compose:
+
+```bash
+# Build and start all services in detached mode
+docker-compose up --build -d
+
+# Stop and remove all services
+docker-compose down
+```
 
 ## Development
 

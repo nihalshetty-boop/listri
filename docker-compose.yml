@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    networks:
+      - listri-network
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: 'postgresql://user:password@db:5432/listri'
+    networks:
+      - listri-network
+
+  chat:
+    build:
+      context: ./apps/services/chat
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+    networks:
+      - listri-network
+
+  search:
+    build:
+      context: ./apps/services/search
+      dockerfile: Dockerfile
+    ports:
+      - '8082:8082'
+    networks:
+      - listri-network
+
+  monitor:
+    build:
+      context: ./apps/services/monitor
+      dockerfile: Dockerfile
+    ports:
+      - '9090:9090'
+    networks:
+      - listri-network
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: listri
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - listri-network
+
+networks:
+  listri-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
